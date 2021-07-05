@@ -36,6 +36,13 @@ private:
     }
 
 public:
+    // Default constructor; creates empty tree
+    BinarySearchTree() : m_rootNode{nullptr}
+    {
+
+    }
+
+    // Constructor with provided root node
     BinarySearchTree(Node <T>* rootNode) : m_rootNode{rootNode}
     {
 
@@ -50,6 +57,13 @@ public:
     // Search with a key; default search() starts from root of BST
     Node<T>* search(int key, Node<T>* rootNode = nullptr)
     {
+        // Exception empty tree
+        if (m_rootNode == nullptr)
+        {
+            cout << "Failed to search. Tree is empty\n";
+            return nullptr;
+        }
+
         if (rootNode != nullptr){
             // Key found
             if (rootNode->key() == key)
@@ -91,14 +105,14 @@ public:
             }
         }
 
-        // ERROR
-        cerr << "ERROR --- node with provided key not found \n";    //TRY, THROW AND CATCH HERE INSTEAD
+        // Not found
+        cerr << "Node with provided key not found \n";    //TRY, THROW AND CATCH HERE INSTEAD
         return nullptr;
     }
 
     void addNode(int key, T data)
     {
-        //Check if key is already in the tree
+        // Check if key is already in the tree        
         if(search(key) != nullptr)
         {
             cerr << "Can't add another node with same key in the binary search tree!\n";
@@ -116,26 +130,174 @@ public:
         Node<T>* prev = nullptr;
         Node<T>* temp = m_rootNode;
 
-        //
-        while (temp != nullptr){
+        // Traversing tree to an empty node
+        while (temp != nullptr)
+        {
             // Root key greater than to be inserted key
-            if(temp->key() > key){
+            if(temp->key() > key)
+            {
                 prev = temp;    // Save pointer to former root node
                 temp = temp->leftChild();
             }
             // Root key smaller than to be inserted key
-            else if (temp->key() < key){
+            else if (temp->key() < key)
+            {
                  prev = temp;
                  temp = temp->rightChild();
             }
         }
 
-        //If inserted node's key is smaller it becomes left child of prev, otherwise it becomes right child
+        // If inserted node's key is smaller it becomes left child of prev, otherwise it becomes right child
         if(prev->key() > key)
+        {
             prev->setLeftChild(node);
+            node->setParent(prev);
+        }
         else
+        {
             prev->setRightChild(node);
+            node->setParent(prev);
+        }
     }
+
+    Node<T>* minKeyNode(Node<T>* root)
+    {
+        Node<T>* current = root;
+
+        /* loop down to find the leftmost leaf */
+        while (current && current->leftChild() != nullptr)
+        {
+            current = current->leftChild();
+        }
+        return current;
+    }
+
+    void deleteNode(int key)
+    {
+        // Empty tree; exception
+        if (m_rootNode == nullptr)
+        {
+            cerr << "Delete operation can't be executed. Tree is empty.\n";
+        }
+
+        Node<T>* toBeDeletedNode = search(key);
+
+        // Add exception handling here
+        if (toBeDeletedNode == nullptr)
+        {
+            cerr << "To be deleted node not found with provided key!\n";
+        }
+
+        // Node is a leave (no childs)
+        if (toBeDeletedNode->leftChild() == nullptr && toBeDeletedNode->rightChild() == nullptr)
+        {
+            //Pointer of its parent needs to be set to nullptr
+            if( toBeDeletedNode->key() > toBeDeletedNode->parent()->key())
+            {
+                toBeDeletedNode->parent()->setRightChild(nullptr);     // Greater -> right child
+            }
+            else
+            {
+                toBeDeletedNode->parent()->setLeftChild(nullptr);                    // Smaller -> left child
+            }
+            delete toBeDeletedNode;     // Delete dynamically allocated memory of node
+            return;
+        }
+        // With only one child (left child)
+        else if (toBeDeletedNode->leftChild() != nullptr && toBeDeletedNode->rightChild() == nullptr)
+        {
+            Node<T>* replacementNode = toBeDeletedNode->leftChild();  // Save left child of toBeDeletedNode as its replacement
+            replacementNode->setParent(toBeDeletedNode->parent());    // Parent of toBeDeletedNode becomes parent of its replacement
+            // replacementNode should keep its old children independent if there are any or not
+            // now the child pointer of the parent of toBeDeletedNode needs to be set to the replacement, so we check if the node was left or right child by comparing their key values
+            if( toBeDeletedNode->key() > toBeDeletedNode->parent()->key())
+            {
+                toBeDeletedNode->parent()->setRightChild(replacementNode);     // Greater than parent means replacementNode becomes right child
+            }
+            else
+            {
+                toBeDeletedNode->parent()->setLeftChild(replacementNode);                    // Smaller -> left child
+            }
+            delete toBeDeletedNode;     // Delete dynamically allocated memory of node
+            return;
+        }
+        // With only one child (right child)
+        else if (toBeDeletedNode->rightChild() != nullptr && toBeDeletedNode->leftChild() == nullptr)
+        {
+            Node<T>* replacementNode = toBeDeletedNode->rightChild();  // Save left child of toBeDeletedNode as its replacement
+            replacementNode->setParent(toBeDeletedNode->parent());    // Parent of toBeDeletedNode becomes parent of its replacement
+            // replacementNode should keep its old children independent if there are any or not
+            // now the child pointer of the parent of toBeDeletedNode needs to be set to the replacement, so we check if the node was left or right child by comparing their key values
+            if(toBeDeletedNode->key() > toBeDeletedNode->parent()->key())
+            {
+                toBeDeletedNode->parent()->setRightChild(replacementNode);     // Greater than parent means replacementNode becomes right child
+            }
+            else
+            {
+                toBeDeletedNode->parent()->setLeftChild(replacementNode);                    // Smaller -> left child
+            }
+            delete toBeDeletedNode;     // Delete dynamically allocated memory of node
+            return;
+        }
+        // Two children
+        else
+        {
+            // Inorder (left - root - right) successor (from right subtree) replaces the toBeDeletedNode; so the minimum node / leftmost leaf of the right subtree
+            // node with two children:
+            // Get the inorder successor
+            // (smallest in the right subtree)
+            Node<T>* temp = minKeyNode(toBeDeletedNode->rightChild());
+
+            // Parent of leftmost leave of the right subtree has to set it's child pointer to nullptr
+            if( temp->key() > temp->parent()->key())
+            {
+                temp->parent()->setRightChild(nullptr);     // Greater -> right child
+            }
+            else
+            {
+                temp->parent()->setLeftChild(nullptr);                    // Smaller -> left child
+            }
+
+            // Copy the inorder
+            // successor's content to this node
+            toBeDeletedNode->setKey(temp->key());
+            toBeDeletedNode->setData(temp->data());
+
+
+            // Delete the inorder successor
+            delete temp;
+        }
+
+
+//        // if key is same as root's key,
+//        // then This is the node
+//        // to be deleted
+//        else {
+//            // node with only one child or no child
+//            if (root->left == NULL) {
+//                struct node* temp = root->right;
+//                free(root);
+//                return temp;
+//            }
+//            else if (root->right == NULL) {
+//                struct node* temp = root->left;
+//                free(root);
+//                return temp;
+//            }
+
+//            // node with two children:
+//            // Get the inorder successor
+//            // (smallest in the right subtree)
+//            struct node* temp = minValueNode(root->right);
+
+//            // Copy the inorder
+//            // successor's content to this node
+//            root->key = temp->key;
+
+//            // Delete the inorder successor
+//            root->right = deleteNode(root->right, temp->key);
+//        }
+}
 
     /*
     // DESTRUCTOR

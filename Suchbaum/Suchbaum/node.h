@@ -13,6 +13,7 @@ private:
     T m_data;
     Node<T>* m_leftChild {nullptr};
     Node<T>* m_rightChild {nullptr};
+    Node<T>* m_parent {nullptr};        // Is not necessary for a BST, you lose memory but looking up parent doesn't need to be done per algorithm
 
 public:
     // Constructor
@@ -113,13 +114,18 @@ public:
         cout << m_key << ' ';
     }
 
-    // Getter for leftChild and rightChild
+    // Getter for leftChild and rightChild and parent
     Node<T>* leftChild() const{
         return m_leftChild;
     }
 
     Node<T>* rightChild() const{
         return m_rightChild;
+    }
+
+    Node<T>* parent() const
+    {
+        return m_parent;
     }
 
     // Getter for key
@@ -136,7 +142,7 @@ public:
 
 
 
-    // Setter for leftChild and rightChild
+    // Setter for leftChild and rightChild and parent
     void setLeftChild(Node<T>* leftChild)
     {
         m_leftChild = leftChild;
@@ -147,16 +153,31 @@ public:
         m_rightChild = rightChild;
     }
 
+    void setParent(Node<T> *parent)
+    {
+        m_parent = parent;
+    }
 
+    void setData(const T &data)
+    {
+        m_data = data;
+    }
+
+    void setKey(int key)
+    {
+        m_key = key;
+    }
 
     // DESTRUCTOR
     ~Node()
     {
-        delete m_leftChild;
-        delete m_rightChild;
-    }
 
+    }
 };
+
+
+
+
 
 
 
