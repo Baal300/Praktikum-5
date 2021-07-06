@@ -76,10 +76,13 @@ int main()
     searchTree.addNode(10,10);
     searchTree.addNode(12,12);
     searchTree.addNode(5,7);
+//    searchTree.print();
+//    searchTree.deleteNode(12);
+//    searchTree.print();
+//    searchTree.deleteNode(3);
     searchTree.print();
-    searchTree.deleteNode(12);
-    searchTree.print();
-    searchTree.deleteNode(3);
+    // Left rotation of root
+    searchTree.rightRotate(7);
     searchTree.print();
 
     return 0;

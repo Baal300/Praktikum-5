@@ -266,38 +266,82 @@ public:
 
             // Delete the inorder successor
             delete temp;
+        }       
+    }
+
+    void leftRotate(int xNodeKey)
+    {
+        // x is the root node we want to rotate around
+        Node <T>* xNode = search(xNodeKey);
+        // y is x's right child
+        Node <T>* yNode = xNode->rightChild();
+        // y's left subtree becomes x's right subtree
+        xNode->setRightChild(yNode->leftChild());
+        // if y had a left child, its new parent is x
+        if (yNode->leftChild() != nullptr)
+        {
+            yNode->leftChild()->setParent(xNode);
+        }
+        // x's parent is y's parent now
+        yNode->setParent(xNode->parent());
+        if (xNode->parent() == nullptr)
+        {
+            // if x was the root node y becomes root node
+            m_rootNode = yNode;
+        }
+        // if x was a left child, y becomes left child of x's former parent
+        else if (xNode == xNode->parent()->leftChild())
+        {
+            xNode->parent()->setLeftChild(yNode);
+        }
+        // y becomes right child
+        else
+        {
+            xNode->parent()->setRightChild(yNode);
         }
 
+        // x is y's left child now
+        yNode->setLeftChild(xNode);
+        // x's parent is y
+        xNode->setParent(yNode);
+    }
 
-//        // if key is same as root's key,
-//        // then This is the node
-//        // to be deleted
-//        else {
-//            // node with only one child or no child
-//            if (root->left == NULL) {
-//                struct node* temp = root->right;
-//                free(root);
-//                return temp;
-//            }
-//            else if (root->right == NULL) {
-//                struct node* temp = root->left;
-//                free(root);
-//                return temp;
-//            }
+    void rightRotate(int xNodeKey)
+    {
+        // x is the root node we want to rotate around
+        Node <T>* xNode = search(xNodeKey);
+        // y is x's left child
+        Node <T>* yNode = xNode->leftChild();
+        // y's right subtree becomes x's left subtree
+        xNode->setLeftChild(yNode->rightChild());
+        // if y had a right child, its new parent is x
+        if (yNode->rightChild() != nullptr)
+        {
+            yNode->rightChild()->setParent(xNode);
+        }
+        // x's parent is y's parent now
+        yNode->setParent(xNode->parent());
+        if (xNode->parent() == nullptr)
+        {
+            // if x was the root node y becomes root node
+            m_rootNode = yNode;
+        }
+        // if x was a left child, y becomes left child of x's former parent
+        else if (xNode == xNode->parent()->leftChild())
+        {
+            xNode->parent()->setLeftChild(yNode);
+        }
+        // y becomes right child
+        else
+        {
+            xNode->parent()->setRightChild(yNode);
+        }
 
-//            // node with two children:
-//            // Get the inorder successor
-//            // (smallest in the right subtree)
-//            struct node* temp = minValueNode(root->right);
-
-//            // Copy the inorder
-//            // successor's content to this node
-//            root->key = temp->key;
-
-//            // Delete the inorder successor
-//            root->right = deleteNode(root->right, temp->key);
-//        }
-}
+        // x is y's right child now
+        yNode->setRightChild(xNode);
+        // x's parent is y
+        xNode->setParent(yNode);
+    }
 
     /*
     // DESTRUCTOR
