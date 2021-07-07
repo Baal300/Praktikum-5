@@ -343,6 +343,46 @@ public:
         xNode->setParent(yNode);
     }
 
+    void balance(Node<T>* toBeRotatedNode)
+    {
+        // Height of left subtree
+        int leftHeight = m_rootNode->leftChild()->getHeight();
+        cout << leftHeight << '\n';
+        // Height of right subtree
+        int rightHeight = m_rootNode->rightChild()->getHeight();
+        cout << rightHeight << '\n';
+
+        // Condition for rotation
+        int rotationThreshold {1};
+        // If left subtree is bigger in height than right subtree by more than 1
+        if(leftHeight - rightHeight > rotationThreshold)
+        {
+            // Keeps rotating until difference isn't bigger than 1 anymore
+            while(leftHeight - rightHeight > rotationThreshold){
+                rightRotate(toBeRotatedNode->key());
+                // Calculates new height after rotation
+                leftHeight = m_rootNode->leftChild()->getHeight();
+            }
+
+        }
+        // If right subtree is bigger in height than left subtree by more than 1
+        else if (rightHeight - leftHeight > rotationThreshold)
+        {
+            // Keeps rotating until difference isn't bigger than 1 anymore
+            while(rightHeight - leftHeight > rotationThreshold){
+                leftRotate(toBeRotatedNode->key());
+                // Calculates new height after rotation
+                rightHeight = m_rootNode->rightChild()->getHeight();
+            }
+        }
+    }
+
+    // Getter for root node
+    Node<T>* getRootNode() const
+    {
+        return m_rootNode;
+    }
+
     /*
     // DESTRUCTOR
     ~BinarySearchTree()
@@ -362,5 +402,7 @@ public:
     }
     */
 
+    Node<T> *rootNode() const;
 };
+
 #endif // BINARYSEARCHTREE_H

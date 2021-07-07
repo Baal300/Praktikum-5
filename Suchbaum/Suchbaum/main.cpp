@@ -80,10 +80,17 @@ int main()
 //    searchTree.deleteNode(12);
 //    searchTree.print();
 //    searchTree.deleteNode(3);
+//    searchTree.print();
+//    // Left rotation of root
+//    searchTree.rightRotate(7);
+//    searchTree.print();
+    // Height of root node
+    cout << searchTree.getRootNode()->getHeight() << '\n';
     searchTree.print();
-    // Left rotation of root
-    searchTree.rightRotate(7);
+    searchTree.balance(searchTree.getRootNode());
     searchTree.print();
+    cout << searchTree.getRootNode()->getHeight() << '\n';
+
 
     return 0;
 }

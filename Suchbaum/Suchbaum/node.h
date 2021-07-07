@@ -67,7 +67,7 @@ public:
     }
 
     // Preorder output without structure
-    void printPreorder()
+    void printPreorder() const
     {
         cout << m_key << ' ';
 
@@ -83,7 +83,7 @@ public:
     }
 
     // Inorder output without structure
-    void printInorder()
+    void printInorder() const
     {
         if (leftChild() != nullptr)
         {
@@ -99,7 +99,7 @@ public:
     }
 
     // Postorder output without structure
-    void printPostorder()
+    void printPostorder() const
     {
         if (leftChild() != nullptr)
         {
@@ -167,6 +167,48 @@ public:
     {
         m_key = key;
     }
+
+    // Returns height of a node's subtree
+    int getHeight()
+    {
+        // Start with height 1
+        int height{1};
+        // Node has no children
+        if (m_leftChild == nullptr && m_rightChild == nullptr)
+        {
+            return height;
+        }
+        // If it has children -> height+1
+        else
+        {
+            int leftHeight {0};
+            int rightHeight {0};
+            // Recursion to left subtree
+            if (m_leftChild!= nullptr)
+            {
+                leftHeight = m_leftChild->getHeight();
+            }
+            // Recursion to right subtree
+            if (m_rightChild != nullptr)
+            {
+                rightHeight = m_rightChild->getHeight();
+            }
+
+            // If left subtree is deeper than right subtree, add leftHeight to height
+            if(leftHeight > rightHeight)
+            {
+                height += leftHeight;
+            }
+            // Else add rightHeight
+            else
+            {
+                height += rightHeight;
+            }
+
+            return height;
+        }
+    }
+
 
     // DESTRUCTOR
     ~Node()
