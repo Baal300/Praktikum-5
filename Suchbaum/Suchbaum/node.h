@@ -116,7 +116,7 @@ public:
 
     // Getter for leftChild and rightChild and parent
     Node<T>* leftChild() const{
-        return m_leftChild;
+         return m_leftChild;
     }
 
     Node<T>* rightChild() const{
@@ -171,6 +171,18 @@ public:
     // Returns height of a node's subtree
     int getHeight()
     {
+        // Exception if node doesn't exist
+        try {
+            if (this == nullptr)
+            {
+                throw runtime_error("Failed to calculate height of node. Node doesn't exist.");
+            }
+        }  catch (runtime_error &e) {
+            cerr << e.what() << '\n';
+            return 0;
+        }
+
+
         // Start with height 1
         int height{1};
         // Node has no children
@@ -184,7 +196,7 @@ public:
             int leftHeight {0};
             int rightHeight {0};
             // Recursion to left subtree
-            if (m_leftChild!= nullptr)
+            if (m_leftChild != nullptr)
             {
                 leftHeight = m_leftChild->getHeight();
             }
@@ -207,6 +219,7 @@ public:
 
             return height;
         }
+
     }
 
 

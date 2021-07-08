@@ -51,18 +51,31 @@ public:
     // Print the BST
     void print()
     {
-        m_rootNode->print();
+        if (m_rootNode != nullptr)
+        {
+            m_rootNode->print();
+        }
+        else
+        {
+            cerr << "Can't print. Tree is empty!\n";
+        }
     }
 
     // Search with a key; default search() starts from root of BST
     Node<T>* search(int key, Node<T>* rootNode = nullptr)
     {
         // Exception empty tree
-        if (m_rootNode == nullptr)
-        {
-            cout << "Failed to search. Tree is empty\n";
+        try {
+            if (m_rootNode == nullptr)
+            {
+                throw runtime_error("Failed to search. Tree is empty");
+            }
+
+        }  catch (runtime_error &e) {
+            cerr << e.what() << '\n';
             return nullptr;
         }
+
 
         if (rootNode != nullptr){
             // Key found
@@ -112,15 +125,16 @@ public:
 
     void addNode(int key, T data)
     {
-        // Check if key is already in the tree        
+        // Check if key is already in the tree ; could do this without calling search since search gives an error message everytime node is not found
         if(search(key) != nullptr)
         {
             cerr << "Can't add another node with same key in the binary search tree!\n";
             return;
         }
 
-        //READ THE SOLUTION
+        // New node is created
         Node<T>* node = new Node<T>(key, data);
+        // If tree is empty node is the root node
         if(m_rootNode == nullptr)
         {
             m_rootNode = node;
@@ -130,16 +144,16 @@ public:
         Node<T>* prev = nullptr;
         Node<T>* temp = m_rootNode;
 
-        // Traversing tree to an empty node
+        // Traversing tree to an empty node to place new node as a leaf
         while (temp != nullptr)
         {
-            // Root key greater than to be inserted key
+            // Root key greater than to be inserted key, go left
             if(temp->key() > key)
             {
                 prev = temp;    // Save pointer to former root node
                 temp = temp->leftChild();
             }
-            // Root key smaller than to be inserted key
+            // Root key smaller than to be inserted key, go right
             else if (temp->key() < key)
             {
                  prev = temp;
@@ -164,7 +178,7 @@ public:
     {
         Node<T>* current = root;
 
-        /* loop down to find the leftmost leaf */
+        // Get the leftmost node which should be node with smallest key
         while (current && current->leftChild() != nullptr)
         {
             current = current->leftChild();
@@ -174,18 +188,26 @@ public:
 
     void deleteNode(int key)
     {
-        // Empty tree; exception
-        if (m_rootNode == nullptr)
-        {
-            cerr << "Delete operation can't be executed. Tree is empty.\n";
+
+        try {
+            // Empty tree; exception
+            if (m_rootNode == nullptr)
+            {
+                throw runtime_error("Delete operation can't be executed. Tree is empty.");
+            }
+        }  catch (runtime_error &empty) {
+            cerr << empty.what() << '\n';
         }
 
         Node<T>* toBeDeletedNode = search(key);
 
-        // Add exception handling here
-        if (toBeDeletedNode == nullptr)
-        {
-            cerr << "To be deleted node not found with provided key!\n";
+        try {
+            if (toBeDeletedNode == nullptr)
+            {
+                throw runtime_error("To be deleted node not found with provided key!\n");
+            }
+        }  catch (runtime_error &notFound) {
+            cerr << notFound.what() << '\n';
         }
 
         // Node is a leave (no childs)
@@ -275,6 +297,18 @@ public:
         Node <T>* xNode = search(xNodeKey);
         // y is x's right child
         Node <T>* yNode = xNode->rightChild();
+
+        //If xNode does not have a right child to rotate with
+        try {
+            if(yNode == nullptr)
+            {
+                throw runtime_error("Failed to rotate left because given node has no right child.");
+            }
+        }  catch (runtime_error &e) {
+            cout << e.what() << '\n';
+            return;
+        }
+
         // y's left subtree becomes x's right subtree
         xNode->setRightChild(yNode->leftChild());
         // if y had a left child, its new parent is x
@@ -312,6 +346,18 @@ public:
         Node <T>* xNode = search(xNodeKey);
         // y is x's left child
         Node <T>* yNode = xNode->leftChild();
+
+        //If xNode does not have a left child to rotate with
+        try {
+            if(yNode == nullptr)
+            {
+                throw runtime_error("Failed to rotate right because given node has no left child.");
+            }
+        }  catch (runtime_error &e) {
+            cout << e.what() << '\n';
+            return;
+        }
+
         // y's right subtree becomes x's left subtree
         xNode->setLeftChild(yNode->rightChild());
         // if y had a right child, its new parent is x
@@ -345,34 +391,58 @@ public:
 
     void balance(Node<T>* toBeRotatedNode)
     {
+        try {
+            if (toBeRotatedNode == nullptr)
+            {
+                throw runtime_error("Balance failed. Node doesn't exist!");
+            }
+        }  catch (runtime_error &e) {
+            cerr << e.what() << '\n';
+            return;
+        }
+        int leftHeight {0};
+        int rightHeight{0};
+
         // Height of left subtree
-        int leftHeight = m_rootNode->leftChild()->getHeight();
+        if (m_rootNode->leftChild() != nullptr)
+        {
+        leftHeight = m_rootNode->leftChild()->getHeight();
         cout << leftHeight << '\n';
+        }
+
+
         // Height of right subtree
-        int rightHeight = m_rootNode->rightChild()->getHeight();
+        if (m_rootNode->rightChild() != nullptr)
+        {
+        rightHeight = m_rootNode->rightChild()->getHeight();
         cout << rightHeight << '\n';
+        }
 
         // Condition for rotation
         int rotationThreshold {1};
         // If left subtree is bigger in height than right subtree by more than 1
         if(leftHeight - rightHeight > rotationThreshold)
         {
-            // Keeps rotating until difference isn't bigger than 1 anymore
+            // Keeps rotating right until difference isn't bigger than 1 anymore
             while(leftHeight - rightHeight > rotationThreshold){
+                toBeRotatedNode = m_rootNode;                   // After rotation we have to get the new root node
                 rightRotate(toBeRotatedNode->key());
                 // Calculates new height after rotation
                 leftHeight = m_rootNode->leftChild()->getHeight();
+                rightHeight = m_rootNode->rightChild()->getHeight();
             }
 
         }
         // If right subtree is bigger in height than left subtree by more than 1
         else if (rightHeight - leftHeight > rotationThreshold)
         {
-            // Keeps rotating until difference isn't bigger than 1 anymore
+            // Keeps rotating left until difference isn't bigger than 1 anymore
             while(rightHeight - leftHeight > rotationThreshold){
+                toBeRotatedNode = m_rootNode;                   // After rotation we have to get the new root node
                 leftRotate(toBeRotatedNode->key());
                 // Calculates new height after rotation
                 rightHeight = m_rootNode->rightChild()->getHeight();
+                leftHeight = m_rootNode->leftChild()->getHeight();
             }
         }
     }
@@ -383,26 +453,124 @@ public:
         return m_rootNode;
     }
 
-    /*
+    void destroyRecursive(Node<T>* node)
+    {
+        if(node != nullptr)
+        {
+            // Deletes deepest nodes in tree first
+            destroyRecursive(node->leftChild());
+            destroyRecursive(node->rightChild());
+            delete node;        // Free dynamically allocated memory
+            node = nullptr;     // Prevents that pointer points to garbage
+        }
+    }
+
     // DESTRUCTOR
     ~BinarySearchTree()
     {
-        //Traverse tree Inorder
-        if (m_rootNode->leftChild() != nullptr)
-        {
-            m_leftChild->deleteInorder();
-        }
-
-        if (rightChild() != nullptr)
-        {
-            m_rightChild->deInorder();;
-        }
-
-        cout << m_key << ' ';
+       destroyRecursive(m_rootNode);
+       m_rootNode = nullptr;
     }
-    */
 
-    Node<T> *rootNode() const;
+    void menu()
+    {
+        do{
+            int menuSelection;
+
+            //Try and Catch, in case user enters an invalid number
+            do{
+                try
+                {
+                    cout << "*************MENU*************\n"
+                         << "Please select an option from the menu by entering one of the following numbers\n"
+                         << "(1) Insert a node\n"
+                         << "(2) Delete a node\n"
+                         << "(3) Print tree\n"
+                         << "(4) Rotate left\n"
+                         << "(5) Rotate right\n"
+                         << "(6) Balance\n"
+                         << "(7) Quit\n"
+                         << "\nMenu selection: ";
+
+                    cin >> menuSelection;
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n'); //In case we have extraneous inputs
+
+                    if (cin.fail())
+                    {
+                        cin.clear(); //clears error flags
+                        cin.ignore(numeric_limits<streamsize>::max(), '\n'); //removes bad input from stream
+                        throw invalid_argument("Enter only valid numbers please!");
+                    }
+                    else if (menuSelection < 1 || menuSelection > 7)
+                    {
+                        throw invalid_argument("Please enter a valid number from 1-7!");
+                    }
+
+                }
+                catch (invalid_argument &invalidNumber)
+                {
+                    cerr << invalidNumber.what() << '\n';
+                    continue;
+                }
+
+                break;
+            }while(true);
+
+            switch (menuSelection) {
+            // Insert node
+            case 1:
+                int insertKey;
+                int insertData;
+                cout << "Enter key for node: ";
+                cin >> insertKey;
+                cout << "Enter data for node: ";
+                cin >> insertData;
+                addNode(insertKey, insertData);
+                break;
+            // Delete node
+            case 2:
+                int deleteKey;
+                cout << "Enter key for node to be deleted: ";
+                cin >> deleteKey;
+                deleteNode(deleteKey);
+                break;
+            // Print tree
+            case 3:
+                print();
+                break;
+            // Rotate left
+            case 4:
+                int leftRotateKey;
+                cout << "Enter key of node to be rotated to the left: ";
+                cin >> leftRotateKey;
+                leftRotate(leftRotateKey);
+                break;
+            // Rotate right
+            case 5:
+                int rightRotateKey;
+                cout << "Enter key of node to be rotated to the right: ";
+                cin >> rightRotateKey;
+                rightRotate(rightRotateKey);
+                break;
+            // Balance tree
+            case 6:
+                balance(m_rootNode);
+                break;
+            case 7:
+                break;
+            default:
+                cerr << "ERROR\n";
+                break;
+            }
+
+            //If user enters 6 loop is broken and user quits menu, otherwise menu opens again
+            if(menuSelection == 7)
+            {
+                break;
+            }
+
+        }while(true);
+    }
 };
 
 #endif // BINARYSEARCHTREE_H

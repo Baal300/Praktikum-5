@@ -85,12 +85,33 @@ int main()
 //    searchTree.rightRotate(7);
 //    searchTree.print();
     // Height of root node
-    cout << searchTree.getRootNode()->getHeight() << '\n';
-    searchTree.print();
-    searchTree.balance(searchTree.getRootNode());
-    searchTree.print();
-    cout << searchTree.getRootNode()->getHeight() << '\n';
+//    searchTree.~BinarySearchTree();
+//    cout << searchTree.getRootNode()->getHeight() << '\n';
+//    searchTree.print();
+//    searchTree.balance(searchTree.getRootNode());
+//    searchTree.print();
+//    cout << searchTree.getRootNode()->getHeight() << '\n';
+//    searchTree.print();
 
+    BinarySearchTree<int> searchTreeTwo;
+    searchTreeTwo.addNode(1,1);
+    searchTreeTwo.addNode(4,4);
+    searchTreeTwo.addNode(6,6);
+    searchTreeTwo.addNode(10,10);
+    searchTreeTwo.addNode(12,12);
+    searchTreeTwo.addNode(5,5);
+    searchTreeTwo.addNode(3,3);
+    searchTreeTwo.addNode(7,7);
+    searchTreeTwo.addNode(9,9);
+    searchTreeTwo.addNode(2,2);
+    searchTreeTwo.addNode(8,8);
+    searchTreeTwo.addNode(11,11);
+    searchTreeTwo.print();
+    searchTreeTwo.balance(searchTreeTwo.getRootNode());
+    searchTreeTwo.print();
+
+    BinarySearchTree<int> menuTree;
+    menuTree.menu();
 
     return 0;
 }
